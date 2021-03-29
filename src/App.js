@@ -1,25 +1,71 @@
-import logo from './logo.svg';
-import './App.css';
+import React, {useState} from 'react';
 
-function App() {
+export default () => {
+  const [nameList, setNames] = useState(['Joe', 'Andy', 'Stew', 'Salma', 'Layla']);
+  const [assignedList, setAssigned] = useState({});
+
+  const setNameList = (e) => {
+    e.preventDefault()
+    setNames([...nameList, e.target.name.value])
+    e.target.name.value = ''
+  }
+
+  const randomizePeople = (names) => {
+    const copyNames = [...names]
+
+    copyNames.forEach((name, index) => {
+      const randomIndex = Math.floor(Math.random() * copyNames.length)
+      copyNames[index] = copyNames[randomIndex]
+      copyNames[randomIndex] = name
+    })
+
+    return copyNames
+  }
+
+  const assignPeople = () => {
+    let names = randomizePeople(nameList)
+
+    const giversMap = {};
+    names.forEach((name, i, array) => {
+      if (i === array.length - 1) {
+        giversMap[name] = array[0];
+        return;
+      }
+      giversMap[name] = array[i + 1];
+    });
+
+    setAssigned(giversMap);
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+    <div className="secret-santa">
+      <h1 className="secret-santa__title">
+        Secret Santa
+      </h1>
+      <form onSubmit={setNameList} className="secret-santa__input">
+        <input name="name" className="secret-santa__input-field"/>
+        <button className="secret-santa__btn">
+          Add name
+        </button>
+      </form>
+      <ul className="secret-santa__name-list">
+        {nameList.map((name, index) =>
+        <li
+          key={name + index}
+          className="secret-santa__participant participant"
         >
-          Learn React
-        </a>
-      </header>
+          {name} {
+            assignedList[name] && '=> ' + assignedList[name]
+          }
+        </li>
+        )}
+      </ul>
+      {
+        nameList.length > 0 &&
+        <button onClick={assignPeople} className="secret-santa__btn">
+          Assign
+        </button>
+      }
     </div>
-  );
+  )
 }
-
-export default App;
